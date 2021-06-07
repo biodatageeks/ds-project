@@ -31,15 +31,40 @@
 
 from kedro.pipeline import Pipeline, node
 
-from .nodes import split_data
+from .nodes import *
 
 
 def create_pipeline(**kwargs):
     return Pipeline(
-        [        
+        [   
+            node(
+                extract_columns,
+                inputs="input_data",
+                outputs="transformed_data1",
+            ),
+            node(
+                apply_string_indexer,
+                inputs="transformed_data1",
+                outputs="transformed_data2",
+            ),
+            node(
+                apply_onehot_encoding,
+                inputs="transformed_data2",
+                outputs="transformed_data3",
+            ),
+            node(
+                apply_vector_assembler,
+                inputs="transformed_data3",
+                outputs="transformed_data4",
+            ),
+            node(
+                apply_string_indexer_on_label,
+                inputs="transformed_data4",
+                outputs="transformed_data5",
+            ),
             node(
                 split_data,
-                inputs=["input_data", "params:example_test_data_ratio"],
+                inputs=["transformed_data5", "params:example_test_data_ratio"],
                 outputs=["training_data", "testing_data"],
             )
         ]
