@@ -22,6 +22,13 @@ logs/**
 # also keep the example dataset
 !data/01_raw/*.csv
 
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# IPython
+profile_default/
+ipython_config.py
+
 
 ##########################
 # Common files
