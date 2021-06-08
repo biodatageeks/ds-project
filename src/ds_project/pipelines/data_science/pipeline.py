@@ -31,7 +31,7 @@
 
 from kedro.pipeline import Pipeline, node
 
-from .nodes import predict, report_accuracy, train_model
+from .nodes import predict, report_accuracy, train_model, log_model
 
 
 def create_pipeline(**kwargs):
@@ -39,8 +39,13 @@ def create_pipeline(**kwargs):
         [
             node(
                 train_model,
-                inputs=["training_data", "parameters"],
+                inputs=["training_data", "engineering_pipeline", "parameters"],
                 outputs="example_classifier",
+            ),
+            node(
+                log_model,
+                inputs=["example_classifier", ],
+                outputs="example_classifier_ml",
             ),
             node(
                 predict,
