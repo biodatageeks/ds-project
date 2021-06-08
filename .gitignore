@@ -41,6 +41,9 @@ mlruns/
 out/
 .idea_modules/
 
+# VSCode
+.vscode/
+
 ### macOS
 *.DS_Store
 .AppleDouble
