@@ -41,7 +41,7 @@ from pyspark.sql import DataFrame
 
 
 def train_model(
-    training_data: DataFrame, parameters: Dict[str, Any]
+    training_data: DataFrame, in_pipeline, parameters: Dict[str, Any]
 ) -> RandomForestClassifier:
     """Node for training a random forest model to classify the data.
     The number of trees is defined in conf/project/parameters.yml
@@ -49,17 +49,28 @@ def train_model(
     For more information about random forest classifier with spark, please visit:
     https://spark.apache.org/docs/latest/ml-classification-regression.html#random-forest-classifier
     """
+    from pyspark.ml import Pipeline
+
     classifier = RandomForestClassifier(numTrees=parameters["example_num_trees"])
-    return classifier.fit(training_data)
+    pipeline = Pipeline(stages=in_pipeline.getStages() + [classifier])
+    # training_data.printSchema()
+    # print(pipeline.getStages())
+
+    return pipeline.fit(training_data)
+
+def log_model(model):
+    
+    return model
 
 
-def predict(model: RandomForestClassifier, testing_data: DataFrame) -> DataFrame:
+def predict(model, testing_data):
     """Node for making predictions given a pre-trained model and a testing dataset."""
+
     predictions = model.transform(testing_data)
     return predictions
 
 
-def report_accuracy(predictions: DataFrame) -> None:
+def report_accuracy(predictions):
     """Node for reporting the accuracy of the predictions performed by the
     previous node. Notice that this function has no outputs, except logging.
     """

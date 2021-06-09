@@ -28,3 +28,28 @@ input_data:
 example_classifier:
   type: MemoryDataSet
   copy_mode: assign
+
+
+pipeline1:
+  type: MemoryDataSet
+  copy_mode: assign
+
+pipeline2:
+  type: MemoryDataSet
+  copy_mode: assign
+
+pipeline3:
+  type: MemoryDataSet
+  copy_mode: assign
+
+pipeline4:
+  type: MemoryDataSet
+  copy_mode: assign
+
+engineering_pipeline:
+  type: MemoryDataSet
+  copy_mode: assign
+
+example_classifier_ml:
+    type: kedro_mlflow.io.models.MlflowModelLoggerDataSet
+    flavor: mlflow.spark

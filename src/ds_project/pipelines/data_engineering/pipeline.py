@@ -39,32 +39,32 @@ def create_pipeline(**kwargs):
         [   
             node(
                 extract_columns,
-                inputs="input_data",
-                outputs="transformed_data1",
+                inputs=None,
+                outputs="pipeline1",
             ),
             node(
                 apply_string_indexer,
-                inputs="transformed_data1",
-                outputs="transformed_data2",
+                inputs="pipeline1",
+                outputs="pipeline2",
             ),
             node(
                 apply_onehot_encoding,
-                inputs="transformed_data2",
-                outputs="transformed_data3",
+                inputs="pipeline2",
+                outputs="pipeline3",
             ),
             node(
                 apply_vector_assembler,
-                inputs="transformed_data3",
-                outputs="transformed_data4",
+                inputs="pipeline3",
+                outputs="pipeline4",
             ),
             node(
                 apply_string_indexer_on_label,
-                inputs="transformed_data4",
-                outputs="transformed_data5",
+                inputs="pipeline4",
+                outputs="engineering_pipeline",
             ),
             node(
                 split_data,
-                inputs=["transformed_data5", "params:example_test_data_ratio"],
+                inputs=["input_data", "params:example_test_data_ratio"],
                 outputs=["training_data", "testing_data"],
             )
         ]

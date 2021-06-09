@@ -35,7 +35,7 @@ from typing import List
 
 from pyspark.sql import DataFrame
 from pyspark.sql.functions import *
-from pyspark.ml.feature import StringIndexer, VectorAssembler, OneHotEncoder
+from pyspark.ml.feature import StringIndexer, VectorAssembler, OneHotEncoder, SQLTransformer
 
 raw_feature_columns = [
         'OpSys', 
@@ -48,50 +48,44 @@ raw_target_column = "compAboveAvg"
 strIndexOutputCols = ['stringindexed_' + c for c in raw_feature_columns]
 oneHotOutputCols = ['onehot_' + c for c in raw_feature_columns]
 
-def extract_columns(data: DataFrame) -> DataFrame:
-    data = data.withColumn("compAboveAvg", (col("convertedComp") > 65000).cast("String"))
-    data = data.filter("compAboveAvg is not NULL")
+def extract_columns():
+    sql_trans = SQLTransformer(statement=f"SELECT {', '.join(raw_feature_columns)} , CAST((convertedComp > 60000) AS STRING) AS compAboveAvg FROM __THIS__ where convertedComp IS NOT NULL")
+    from pyspark.ml import Pipeline
+    out_pipeline = Pipeline(stages=[sql_trans])
+    return out_pipeline
 
-    transformed_data = data.select(raw_feature_columns + [raw_target_column])
-    return transformed_data
-
-def apply_string_indexer(data: DataFrame) -> DataFrame:
+def apply_string_indexer(in_pipeline):
     strIndexInputCols = raw_feature_columns
-
     indexer = StringIndexer(inputCols=strIndexInputCols, outputCols=strIndexOutputCols).setHandleInvalid("keep")
-    transformed_data = (
-        indexer.fit(data)
-        .transform(data)
-        #.drop(raw_target_column)
-    )
-    return transformed_data
 
-def apply_onehot_encoding(data: DataFrame) -> DataFrame:   
+    from pyspark.ml import Pipeline
+    out_pipeline = Pipeline(stages=in_pipeline.getStages() + [indexer])
+    return out_pipeline
+
+def apply_onehot_encoding(in_pipeline):      
     onehot = OneHotEncoder(inputCols=strIndexOutputCols, outputCols=oneHotOutputCols)
-    transformed_data = (
-        onehot.fit(data)
-        .transform(data)
-        #.drop(raw_target_column)
-    )
-    return transformed_data
 
-def apply_vector_assembler(data: DataFrame) -> DataFrame:   
+    from pyspark.ml import Pipeline
+    out_pipeline = Pipeline(stages=in_pipeline.getStages() + [onehot])
+    return out_pipeline
+
+def apply_vector_assembler(in_pipeline):   
     # merge  feature columns into a single features vector column
     vector_assembler = VectorAssembler(
         inputCols=oneHotOutputCols, outputCol="features"
     )
-    transformed_data = vector_assembler.transform(data)
-    return transformed_data
 
-def apply_string_indexer_on_label (data: DataFrame) -> DataFrame:   
+    from pyspark.ml import Pipeline
+    out_pipeline = Pipeline(stages=in_pipeline.getStages() + [vector_assembler])
+    return out_pipeline
+
+def apply_string_indexer_on_label (in_pipeline):   
     # convert the textual representation of the species into numerical label column
-    indexer = StringIndexer(inputCol=raw_target_column, outputCol="label")
-    transformed_data = (
-        indexer.fit(data)
-        .transform(data)
-        #.drop(raw_target_column)
-    )
-    return transformed_data
+    indexer = StringIndexer(inputCol=raw_target_column, outputCol="label").setHandleInvalid("keep")
+
+    from pyspark.ml import Pipeline
+    out_pipeline = Pipeline(stages=in_pipeline.getStages() + [indexer])
+    return out_pipeline
 
 def split_data(
     transformed_data: DataFrame, example_test_data_ratio: float
