@@ -52,4 +52,3 @@ then
 else
         echo "Jupyter kernel already exists: $KERNEL_FILE"
 fi
-
