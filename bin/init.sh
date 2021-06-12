@@ -3,10 +3,11 @@
 source /opt/conda/etc/profile.d/conda.sh
 PROJECT_NAME=ds-project
 VENV_DIR=$HOME/work/venv/$PROJECT_NAME
+
 if [ ! -d $VENV_DIR ] 
 then
-        echo "Creating venv for ML project"
-        conda create python=$PYTHON_MINOR -p $VENV_DIR -y 
+        echo "Creating venv for ML project: $VENV_DIR"
+        conda create python=$PYTHON_MINOR -p $VENV_DIR -y
         conda activate $VENV_DIR
         pip install kedro==$KEDRO_VERSION
 else
@@ -18,9 +19,9 @@ GIT_DIR=$HOME/work/git/
 PROJECT_DIR=$GIT_DIR/$PROJECT_NAME
 cd $PROJECT_DIR
 kedro install
-# kedro mlflow init
-# sed -i 's/mlflow_tracking_uri: mlruns/mlflow_tracking_uri: http:\/\/localhost:5000/g' conf/local/mlflow.yml
-# cp conf/local/mlflow.yml conf/local-spark/
+kedro mlflow init
+sed -i 's/mlflow_tracking_uri: mlruns/mlflow_tracking_uri: http:\/\/localhost:5000/g' conf/local/mlflow.yml
+cp conf/local/mlflow.yml conf/local-spark/
 conda deactivate
 
 
@@ -51,5 +52,3 @@ then
 else
         echo "Jupyter kernel already exists: $KERNEL_FILE"
 fi
-
-conda activate $VENV_DIR

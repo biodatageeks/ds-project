@@ -49,7 +49,9 @@ strIndexOutputCols = ['stringindexed_' + c for c in raw_feature_columns]
 oneHotOutputCols = ['onehot_' + c for c in raw_feature_columns]
 
 def extract_columns():
-    sql_trans = SQLTransformer(statement=f"SELECT {', '.join(raw_feature_columns)} , CAST((convertedComp > 60000) AS STRING) AS compAboveAvg FROM __THIS__ where convertedComp IS NOT NULL")
+    # https://spark.apache.org/docs/latest/api/python/reference/api/pyspark.ml.feature.SQLTransformer.html
+    sql_statement=""
+    sql_trans = SQLTransformer(statement=sql_statement)
     from pyspark.ml import Pipeline
     out_pipeline = Pipeline(stages=[sql_trans])
     return out_pipeline
@@ -66,7 +68,7 @@ def apply_onehot_encoding(in_pipeline):
     onehot = OneHotEncoder(inputCols=strIndexOutputCols, outputCols=oneHotOutputCols)
 
     from pyspark.ml import Pipeline
-    out_pipeline = Pipeline(stages=in_pipeline.getStages() + [onehot])
+    out_pipeline = Pipeline(stages=in_pipeline.getStages())
     return out_pipeline
 
 def apply_vector_assembler(in_pipeline):   
