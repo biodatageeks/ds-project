@@ -15,7 +15,7 @@ else
         conda activate $VENV_DIR
 fi
 
-GIT_DIR=$HOME/work/git/
+GIT_DIR=$HOME
 PROJECT_DIR=$GIT_DIR/$PROJECT_NAME
 cd $PROJECT_DIR
 kedro install
