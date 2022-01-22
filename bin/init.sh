@@ -10,6 +10,7 @@ then
         conda create python=$PYTHON_MINOR -p $VENV_DIR -y
         conda activate $VENV_DIR
         pip install kedro==$KEDRO_VERSION
+        pip install dynaconf==3.1.4
 else
         echo "Venv for ML project already exists: $VENV_DIR "
         conda activate $VENV_DIR
