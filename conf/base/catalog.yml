@@ -12,7 +12,7 @@
 
 input_data:
   type: spark.SparkDataSet
-  filepath: gs://ds-data-public/survey/2020/survey_results_public.csv
+  filepath: gs://ds-bigdata-public/survey/2020/survey_results_public.csv
   file_format: csv
   load_args:
     header: true
